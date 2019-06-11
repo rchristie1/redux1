@@ -1,26 +1,73 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import * as actions from './store/actions';
+import PropTypes from 'prop-types';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import {bindActionCreators} from 'redux';
+
+class App extends Component {
+  // PropTypes
+  static propTypes = {
+    movies: PropTypes.func.isRequired,
+    directors: PropTypes.func.isRequired,
+    data: PropTypes.object.isRequired,
+  }
+
+  componentDidMount() {
+    this.props.movies();
+    this.props.directors();
+  }
+
+  renderMovies = (movies) => (
+    movies ?
+      movies.map((d, i) => (
+        <div key={i}>
+          {d.name}
+        </div>
+      )): null
+  )
+  renderDirectors = (dir) => (
+    dir ?
+      dir.map((d, i) => (
+        <div key={i}>
+          {d.name}
+        </div>
+      )): null
+  )
+  
+  render() {
+    return <div>
+      
+      {this.renderMovies(this.props.data.movies)}
+      {this.renderDirectors(this.props.data.directors)}
+    </div>;
+  }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    data: state.movies,
+  };
+};
+
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     getMoviesLst: () => {
+//       dispatch(actions.moviesLst());
+//     },
+//     getDirectorList: () => {
+//       dispatch(actions.directorsList());
+//     }
+//   };
+// };
+
+const mapDispatchToProps = dispatch => { 
+  // return bindActionCreators ({[actions][moviesLst], actions.directorsList}, dispatch)
+  return bindActionCreators({movies: actions.moviesLst, directors: actions.directorsList}, dispatch);
+};
+
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App);
